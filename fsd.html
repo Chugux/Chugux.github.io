@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gestión de Palets</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+      background: #f7f7f7;
+      color: #333;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2rem;
+    }
+
+    form {
+      background: #fff;
+      padding: 1rem;
+      margin-bottom: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    label {
+      display: block;
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+
+    input[type="text"], input[type="number"], select {
+      width: 100%;
+      padding: 0.5rem;
+      margin-top: 0.3rem;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      margin-top: 1rem;
+      padding: 0.7rem 1.5rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 5px;
+      background: #007bff;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    .filtros {
+      margin-bottom: 1rem;
+    }
+
+    .producto {
+      background: white;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .producto strong {
+      display: inline-block;
+      min-width: 150px;
+    }
+
+    @media (max-width: 600px) {
+      label, input, select {
+        font-size: 1rem;
+      }
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Gestión de Productos y Palets</h1>
+
+  <form id="productoForm">
+    <label for="nombre">Nombre del Producto:</label>
+    <input type="text" id="nombre" required />
+
+    <label for="palets">Cantidad de Palets:</label>
+    <input type="number" id="palets" required min="1" />
+
+    <label for="observacion">Observación:</label>
+    <input type="text" id="observacion" />
+
+    <label for="etiqueta">Destino del Palet:</label>
+    <select id="etiqueta" required>
+      <option value="">Selecciona un destino</option>
+      <option value="Menorca">Menorca</option>
+      <option value="Ibiza">Ibiza</option>
+      <option value="Isla Palma">Isla Palma</option>
+      <option value="Barcelona">Barcelona</option>
+    </select>
+
+    <div id="subetiquetaContainer" style="display: none;">
+      <label for="subetiqueta">Subetiqueta:</label>
+      <select id="subetiqueta">
+        <option value="">Selecciona una subetiqueta</option>
+        <option value="Ticsa Palma">Ticsa Palma</option>
+        <option value="Roger Palma">Roger Palma</option>
+      </select>
+    </div>
+
+    <label for="origen">Origen del Palet:</label>
+    <select id="origen" required>
+      <option value="">Selecciona un origen</option>
+      <option value="Barcelona">Barcelona</option>
+      <option value="Menorca">Menorca</option>
+      <option value="Ibiza">Ibiza</option>
+      <option value="Isla Palma">Isla Palma</option>
+    </select>
+
+    <button type="submit">Guardar Producto</button>
+  </form>
+
+  <div class="filtros">
+    <label for="filtroEtiqueta">Filtrar por Destino:</label>
+    <select id="filtroEtiqueta">
+      <option value="">Todos</option>
+      <option value="Menorca">Menorca</option>
+      <option value="Ibiza">Ibiza</option>
+      <option value="Isla Palma">Isla Palma</option>
+      <option value="Ticsa Palma">Ticsa Palma</option>
+      <option value="Roger Palma">Roger Palma</option>
+      <option value="Barcelona">Barcelona</option>
+    </select>
+  </div>
+
+  <div id="listaProductos"></div>
+
+  <script>
+    const form = document.getElementById("productoForm");
+    const lista = document.getElementById("listaProductos");
+    const etiquetaSelect = document.getElementById("etiqueta");
+    const subetiquetaContainer = document.getElementById("subetiquetaContainer");
+    const subetiquetaSelect = document.getElementById("subetiqueta");
+    const filtroEtiqueta = document.getElementById("filtroEtiqueta");
+
+    let productos = JSON.parse(localStorage.getItem("productos") || "[]");
+
+    function guardarEnLocalStorage() {
+      localStorage.setItem("productos", JSON.stringify(productos));
+    }
+
+    function renderProductos() {
+      lista.innerHTML = "";
+      let filtrados = [...productos];
+
+      if (filtroEtiqueta.value) {
+        filtrados = filtrados.filter(p =>
+          p.etiqueta === filtroEtiqueta.value || p.subetiqueta === filtroEtiqueta.value
+        );
+      }
+
+      // Ordenar por fecha descendente
+      filtrados.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+
+      filtrados.forEach(p => {
+        const div = document.createElement("div");
+        div.className = "producto";
+        div.innerHTML = `
+          <div><strong>Producto:</strong> ${p.nombre}</div>
+          <div><strong>Palets:</strong> ${p.palets}</div>
+          <div><strong>Observación:</strong> ${p.observacion}</div>
+          <div><strong>Destino del Palet:</strong> ${p.etiqueta}${p.subetiqueta ? " → " + p.subetiqueta : ""}</div>
+          <div><strong>Origen del Palet:</strong> ${p.origen}</div>
+          <div><strong>Fecha de ingreso:</strong> ${new Date(p.fecha).toLocaleString()}</div>
+        `;
+        lista.appendChild(div);
+      });
+    }
+
+    etiquetaSelect.addEventListener("change", () => {
+      if (etiquetaSelect.value === "Isla Palma") {
+        subetiquetaContainer.style.display = "block";
+      } else {
+        subetiquetaContainer.style.display = "none";
+        subetiquetaSelect.value = "";
+      }
+    });
+
+    form.addEventListener("submit", e => {
+      e.preventDefault();
+
+      const nuevoProducto = {
+        nombre: document.getElementById("nombre").value.trim(),
+        palets: parseInt(document.getElementById("palets").value),
+        observacion: document.getElementById("observacion").value.trim(),
+        etiqueta: etiquetaSelect.value,
+        subetiqueta: subetiquetaSelect.value,
+        origen: document.getElementById("origen").value,
+        fecha: new Date().toISOString()
+      };
+
+      productos.push(nuevoProducto);
+      guardarEnLocalStorage();
+      renderProductos();
+      form.reset();
+      subetiquetaContainer.style.display = "none";
+    });
+
+    filtroEtiqueta.addEventListener("change", renderProductos);
+
+    renderProductos();
+  </script>
+</body>
+</html>
