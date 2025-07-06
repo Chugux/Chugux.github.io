@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>Gestión de Productos</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
   <style>
@@ -13,6 +14,10 @@
       color: #333;
       font-size: 18px;
       line-height: 1.6;
+      -webkit-text-size-adjust: 100%;
+      -moz-text-size-adjust: 100%;
+      -ms-text-size-adjust: 100%;
+      text-size-adjust: 100%;
     }
     .contenedor {
       max-width: 800px;
@@ -42,6 +47,7 @@
       font-size: 18px;
       box-sizing: border-box;
       transition: border-color 0.3s ease;
+      touch-action: manipulation;
     }
     input:focus, select:focus, textarea:focus {
       outline: none;
@@ -58,8 +64,9 @@
       border-radius: 8px;
       transition: background 0.3s ease;
       padding: 14px 0;
+      user-select: none;
     }
-    button:hover {
+    button:hover, button:focus {
       background-color: #1565c0;
     }
     .acciones button {
@@ -67,15 +74,16 @@
       font-size: 18px;
       padding: 10px 16px;
       width: auto;
+      user-select: none;
     }
-    .acciones button:hover {
+    .acciones button:hover, .acciones button:focus {
       background-color: #d32f2f;
     }
     .editar-btn {
       background-color: #ffa000;
       margin-right: 10px;
     }
-    .editar-btn:hover {
+    .editar-btn:hover, .editar-btn:focus {
       background-color: #ff8f00;
     }
     .form-section, .salida-form, .filtros-section {
@@ -101,11 +109,13 @@
       box-shadow: 0 3px 8px rgba(0,0,0,0.05);
       font-size: 18px;
       line-height: 1.5;
+      word-wrap: break-word;
     }
     .acciones {
       display: flex;
       gap: 10px;
       margin-top: 15px;
+      flex-wrap: wrap;
     }
     .salida-form {
       margin-top: 18px;
@@ -125,12 +135,13 @@
     /* Responsive para pantallas pequeñas */
     @media (max-width: 600px) {
       body {
-        padding: 20px 15px;
-        font-size: 20px;
+        padding: 15px 10px;
+        font-size: 18px;
       }
 
       .contenedor {
-        padding: 20px 15px;
+        padding: 15px 15px;
+        margin: 0 10px;
       }
 
       input[type="text"],
@@ -138,23 +149,29 @@
       input[type="date"],
       select,
       textarea {
-        font-size: 20px;
-        padding: 16px 20px;
+        font-size: 18px;
+        padding: 12px 14px;
       }
 
       button {
-        font-size: 20px;
-        padding: 16px 0;
+        font-size: 18px;
+        padding: 12px 0;
       }
 
       li.producto {
-        padding: 25px 20px;
-        font-size: 20px;
+        padding: 18px 15px;
+        font-size: 18px;
+      }
+
+      .acciones {
+        flex-direction: column;
       }
 
       .acciones button {
+        width: 100%;
+        margin-bottom: 10px;
         font-size: 18px;
-        padding: 12px 22px;
+        padding: 14px;
       }
     }
   </style>
@@ -167,13 +184,13 @@
       <input type="hidden" id="edit-id" />
       
       <label for="producto">Nombre del Producto:</label>
-      <input type="text" id="producto" />
+      <input type="text" id="producto" autocomplete="off" />
 
       <label for="palets">Cantidad de Palets:</label>
       <input type="number" id="palets" min="1" />
 
       <label for="observacion">Observación:</label>
-      <textarea id="observacion" rows="3"></textarea>
+      <textarea id="observacion" rows="3" autocomplete="off"></textarea>
 
       <label for="origen">Origen del Palet:</label>
       <select id="origen">
@@ -230,7 +247,7 @@
         <option value="Barcelona">Barcelona</option>
       </select>
 
-      <label for="filtro-subetiqueta">Filtrar por Subetiqueta Isla Palma:</label>
+      <label for="filtro-subetiqueta" style="display:none;">Filtrar por Subetiqueta Isla Palma:</label>
       <select id="filtro-subetiqueta" style="display:none;">
         <option value="">Todos</option>
         <option value="Roger Palma">Roger Palma</option>
@@ -249,16 +266,23 @@
   <script>
     const etiquetaSelect = document.getElementById("etiqueta");
     const subetiquetaContainer = document.getElementById("subetiqueta-container");
+    const filtroEtiqueta = document.getElementById("filtro-etiqueta");
+    const filtroSubetiqueta = document.getElementById("filtro-subetiqueta");
 
     etiquetaSelect.addEventListener("change", () => {
       subetiquetaContainer.style.display = etiquetaSelect.value === "Isla Palma" ? "block" : "none";
     });
 
-    const filtroEtiqueta = document.getElementById("filtro-etiqueta");
-    const filtroSubetiqueta = document.getElementById("filtro-subetiqueta");
-
     filtroEtiqueta.addEventListener("change", () => {
-      filtroSubetiqueta.style.display = filtroEtiqueta.value === "Isla Palma" ? "block" : "none";
+      const labelSubetiqueta = filtroSubetiqueta.previousElementSibling;
+      if (filtroEtiqueta.value === "Isla Palma") {
+        filtroSubetiqueta.style.display = "block";
+        if(labelSubetiqueta) labelSubetiqueta.style.display = "block";
+      } else {
+        filtroSubetiqueta.style.display = "none";
+        if(labelSubetiqueta) labelSubetiqueta.style.display = "none";
+        filtroSubetiqueta.value = "";
+      }
     });
 
     function guardarProducto() {
@@ -276,7 +300,6 @@
       let productos = JSON.parse(localStorage.getItem("productos")) || [];
 
       if (idEdit) {
-        // editar producto
         productos = productos.map(p => {
           if (p.id === idEdit) {
             return {
@@ -293,7 +316,6 @@
           return p;
         });
       } else {
-        // nuevo producto
         productos.push({
           id: Date.now().toString(),
           producto,
@@ -324,7 +346,6 @@
 
     function mostrarProductos(productosFiltrados) {
       let productos = productosFiltrados || JSON.parse(localStorage.getItem("productos")) || [];
-      // Ordenar por fecha de ingreso descendente (más reciente primero)
       productos.sort((a,b) => new Date(b.fechaIngreso) - new Date(a.fechaIngreso));
 
       const lista = document.getElementById("lista-productos");
@@ -349,10 +370,10 @@
         li.innerHTML = `
           <strong>Producto:</strong> ${p.producto} <br />
           <strong>Palets:</strong> ${p.palets} <br />
-          <strong>Observación:</strong> ${p.observacion || "-"}<br />
-          <strong>Origen:</strong> ${p.origen} <br />
-          <strong>Etiqueta (Destino):</strong> ${destinoCompleto} <br />
-          <strong>Fecha de ingreso:</strong> ${fechaFormat}
+          <strong>Observación:</strong> ${p.observacion || "Ninguna"}<br />
+          <strong>Origen:</strong> ${p.origen}<br />
+          <strong>Destino (Etiqueta):</strong> ${destinoCompleto}<br />
+          <strong>Fecha Ingreso:</strong> ${fechaFormat}
           <div class="acciones">
             <button class="editar-btn" onclick="editarProducto('${p.id}')">✏️ Editar</button>
             <button onclick="eliminarProducto('${p.id}')">🗑️ Eliminar</button>
@@ -363,24 +384,25 @@
     }
 
     function editarProducto(id) {
-      let productos = JSON.parse(localStorage.getItem("productos")) || [];
-      const p = productos.find(item => item.id === id);
-      if (!p) return;
+      const productos = JSON.parse(localStorage.getItem("productos")) || [];
+      const producto = productos.find(p => p.id === id);
+      if (!producto) return;
 
-      document.getElementById("edit-id").value = p.id;
-      document.getElementById("producto").value = p.producto;
-      document.getElementById("palets").value = p.palets;
-      document.getElementById("observacion").value = p.observacion;
-      document.getElementById("origen").value = p.origen;
-      etiquetaSelect.value = p.etiqueta;
+      document.getElementById("edit-id").value = producto.id;
+      document.getElementById("producto").value = producto.producto;
+      document.getElementById("palets").value = producto.palets;
+      document.getElementById("observacion").value = producto.observacion;
+      document.getElementById("origen").value = producto.origen;
+      etiquetaSelect.value = producto.etiqueta;
 
-      if (p.etiqueta === "Isla Palma") {
+      if (producto.etiqueta === "Isla Palma") {
         subetiquetaContainer.style.display = "block";
-        document.getElementById("subetiqueta").value = p.subetiqueta;
+        document.getElementById("subetiqueta").value = producto.subetiqueta || "";
       } else {
         subetiquetaContainer.style.display = "none";
         document.getElementById("subetiqueta").value = "";
       }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function eliminarProducto(id) {
@@ -392,12 +414,12 @@
     }
 
     function aplicarFiltros() {
-      let productos = JSON.parse(localStorage.getItem("productos")) || [];
-
       const filtroFecha = document.getElementById("filtro-fecha").value;
       const filtroOrigen = document.getElementById("filtro-origen").value;
       const filtroEtiquetaVal = filtroEtiqueta.value;
       const filtroSubetiquetaVal = filtroSubetiqueta.value;
+
+      let productos = JSON.parse(localStorage.getItem("productos")) || [];
 
       if (filtroFecha) {
         productos = productos.filter(p => p.fechaIngreso.startsWith(filtroFecha));
@@ -411,6 +433,7 @@
       if (filtroEtiquetaVal === "Isla Palma" && filtroSubetiquetaVal) {
         productos = productos.filter(p => p.subetiqueta === filtroSubetiquetaVal);
       }
+
       mostrarProductos(productos);
     }
 
@@ -420,9 +443,11 @@
       filtroEtiqueta.value = "";
       filtroSubetiqueta.value = "";
       filtroSubetiqueta.style.display = "none";
+      if(filtroSubetiqueta.previousElementSibling) filtroSubetiqueta.previousElementSibling.style.display = "none";
       mostrarProductos();
     }
 
+    // Mostrar productos al cargar
     mostrarProductos();
   </script>
 </body>
