@@ -2,456 +2,317 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Gestión de Productos</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
+  <title>Gestión de Palets</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
     body {
-      font-family: 'Roboto', sans-serif;
-      background: #f4f7fa;
       margin: 0;
-      padding: 20px;
-      color: #333;
-      font-size: 18px;
-      line-height: 1.6;
+      font-family: 'Segoe UI', sans-serif;
+      font-size: 16px;
+      background: #f4f6f8;
+      color: #222;
+      padding: 1rem;
     }
-    .contenedor {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 20px;
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 3px 15px rgba(0,0,0,0.1);
-    }
-    h2, h3 {
-      color: #0d47a1;
-      margin-bottom: 15px;
+
+    h1, h2 {
       text-align: center;
+      text-transform: capitalize;
     }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+    }
+
     label {
       font-weight: bold;
-      margin-top: 15px;
-      display: block;
+      margin-top: 0.5rem;
     }
-    input, select, textarea, button {
+
+    input, select, button {
       width: 100%;
-      padding: 14px 16px;
-      margin-top: 6px;
-      margin-bottom: 18px;
-      border: 1.5px solid #ccc;
-      border-radius: 8px;
-      font-size: 18px;
-      box-sizing: border-box;
-      transition: border-color 0.3s ease;
+      padding: 0.5rem;
+      margin: 0.25rem 0 1rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
     }
-    input:focus, select:focus, textarea:focus {
-      outline: none;
-      border-color: #1976d2;
-      box-shadow: 0 0 5px rgba(25, 118, 210, 0.5);
-    }
+
     button {
-      background-color: #1976d2;
+      background-color: #007bff;
       color: white;
       border: none;
       cursor: pointer;
-      font-weight: bold;
-      font-size: 20px;
-      border-radius: 8px;
-      transition: background 0.3s ease;
-      padding: 14px 0;
     }
+
     button:hover {
-      background-color: #1565c0;
+      background-color: #0056b3;
     }
-    .acciones button {
-      background-color: #f44336;
-      font-size: 18px;
-      padding: 10px 16px;
-      width: auto;
+
+    .producto {
+      background: #fff;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     }
-    .acciones button:hover {
-      background-color: #d32f2f;
+
+    #eliminar-todos {
+      background-color: #dc3545;
+      margin-bottom: 1rem;
     }
-    .editar-btn {
-      background-color: #ffa000;
-      margin-right: 10px;
+
+    #eliminar-todos:hover {
+      background-color: #a91d2a;
     }
-    .editar-btn:hover {
-      background-color: #ff8f00;
-    }
-    .form-section, .salida-form, .filtros-section {
-      background: #e8f0fe;
-      padding: 25px 30px;
-      margin-bottom: 30px;
-      border-radius: 12px;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.07);
-    }
-    .subetiqueta {
+
+    .subetiqueta, .filtro-sub {
       display: none;
     }
-    ul {
-      padding: 0;
-      list-style-type: none;
-    }
-    li.producto {
-      background: #fafafa;
-      padding: 20px 25px;
-      margin-bottom: 18px;
-      border-left: 8px solid #1976d2;
-      border-radius: 10px;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.05);
-      font-size: 18px;
-      line-height: 1.5;
-      word-wrap: break-word;
-    }
-    .acciones {
-      display: flex;
-      gap: 10px;
-      margin-top: 15px;
-    }
-    .salida-form {
-      margin-top: 18px;
-      background: #dbeeff;
-      padding: 18px 22px;
-      border-left: 6px solid #42a5f5;
+
+    .filtro {
+      background: #ffffff;
+      padding: 1rem;
       border-radius: 8px;
-    }
-    em {
-      display: block;
-      margin-top: 12px;
-      color: #388e3c;
-      font-style: normal;
-      font-weight: bold;
+      margin-top: 2rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
     }
 
-    /* Responsive para pantallas pequeñas */
-    @media (max-width: 600px) {
-      body {
-        padding: 20px 15px;
-        font-size: 20px;
-      }
-
-      .contenedor {
-        padding: 20px 15px;
-      }
-
-      input[type="text"],
-      input[type="number"],
-      input[type="date"],
-      select,
-      textarea {
-        font-size: 20px;
-        padding: 16px 20px;
-      }
-
-      button {
-        font-size: 20px;
-        padding: 16px 0;
-      }
-
-      li.producto {
-        padding: 25px 20px;
-        font-size: 20px;
-        word-wrap: break-word;
-      }
-
-      .acciones button {
-        font-size: 18px;
-        padding: 12px 22px;
-      }
+    .filtro button {
+      margin-top: 0.5rem;
     }
   </style>
 </head>
 <body>
-  <div class="contenedor">
-    <h2>📦 Registro de Producto</h2>
+  <div class="container">
+    <h1>Gestión de Palets</h1>
 
-    <div class="form-section">
-      <input type="hidden" id="edit-id" />
-      
-      <label for="producto">Nombre del Producto:</label>
-      <input type="text" id="producto" />
+    <label for="producto">Nombre del Palet:</label>
+    <input type="text" id="producto" />
 
-      <label for="palets">Cantidad de Palets:</label>
-      <input type="number" id="palets" min="1" />
+    <label for="palets">Cantidad de Palets:</label>
+    <input type="number" id="palets" min="1" />
 
-      <label for="observacion">Observación:</label>
-      <textarea id="observacion" rows="3"></textarea>
+    <label for="observacion">Observación (opcional):</label>
+    <input type="text" id="observacion" />
 
-      <label for="origen">Origen del Palet:</label>
-      <select id="origen">
-        <option value="">Selecciona origen</option>
-        <option value="BARCELONA">BARCELONA</option>
-        <option value="ISLA PALMA">ISLA PALMA</option>
-        <option value="MENORCA">MENORCA</option>
-        <option value="IBIZA">IBIZA</option>
+    <label for="origen">Origen del Palet:</label>
+    <select id="origen">
+      <option value="">Selecciona el origen</option>
+      <option value="isla palma">Isla palma</option>
+      <option value="barcelona">Barcelona</option>
+      <option value="menorca">Menorca</option>
+      <option value="ibiza">Ibiza</option>
+    </select>
+
+    <div id="subetiqueta-origen-container" class="subetiqueta">
+      <label for="subetiqueta-origen">Elige la isla (opcional):</label>
+      <select id="subetiqueta-origen">
+        <option value="">Selecciona</option>
+        <option value="roger palma">Roger palma</option>
+        <option value="ticsa palma">Ticsa palma</option>
+      </select>
+    </div>
+
+    <label for="etiqueta">Destino del Palet:</label>
+    <select id="etiqueta">
+      <option value="">Selecciona el destino</option>
+      <option value="isla palma">Isla palma</option>
+      <option value="barcelona">Barcelona</option>
+      <option value="menorca">Menorca</option>
+      <option value="ibiza">Ibiza</option>
+    </select>
+
+    <div id="subetiqueta-etiqueta-container" class="subetiqueta">
+      <label for="subetiqueta-etiqueta">Elige la isla (opcional):</label>
+      <select id="subetiqueta-etiqueta">
+        <option value="">Selecciona</option>
+        <option value="roger palma">Roger palma</option>
+        <option value="ticsa palma">Ticsa palma</option>
+      </select>
+    </div>
+
+    <button id="guardar">Guardar producto</button>
+
+    <div class="filtro">
+      <h2>Filtrar Palets</h2>
+
+      <label for="filtro-origen">Filtrar por origen:</label>
+      <select id="filtro-origen">
+        <option value="">Todos</option>
+        <option value="isla palma">Isla palma</option>
+        <option value="barcelona">Barcelona</option>
+        <option value="menorca">Menorca</option>
+        <option value="ibiza">Ibiza</option>
       </select>
 
-      <label for="etiqueta">Etiqueta (Destino):</label>
-      <select id="etiqueta">
-        <option value="">Selecciona una etiqueta</option>
-        <option value="Isla Palma">Isla Palma</option>
-        <option value="Menorca">Menorca</option>
-        <option value="Ibiza">Ibiza</option>
-        <option value="Barcelona">Barcelona</option>
-      </select>
-
-      <div id="subetiqueta-container" class="subetiqueta">
-        <label for="subetiqueta">Subetiqueta de Isla Palma:</label>
-        <select id="subetiqueta">
-          <option value="">Selecciona una subetiqueta</option>
-          <option value="Roger Palma">Roger Palma</option>
-          <option value="Ticsa Palma">Ticsa Palma</option>
-          <option value="Solo Isla Palma">Solo Isla Palma</option>
+      <div id="filtro-suborigen-container" class="filtro-sub">
+        <label for="filtro-suborigen">Elige la isla (origen):</label>
+        <select id="filtro-suborigen">
+          <option value="">Todos</option>
+          <option value="roger palma">Roger palma</option>
+          <option value="ticsa palma">Ticsa palma</option>
         </select>
       </div>
 
-      <button onclick="guardarProducto()">💾 Guardar Producto</button>
-      <button onclick="mostrarProductos()">📅 Ver Productos</button>
-    </div>
-
-    <div class="filtros-section">
-      <h3>🔎 Filtros de productos</h3>
-      <label for="filtro-fecha">Filtrar por Fecha de Ingreso (YYYY-MM-DD):</label>
-      <input type="date" id="filtro-fecha" />
-
-      <label for="filtro-origen">Filtrar por Origen:</label>
-      <select id="filtro-origen">
-        <option value="">Todos</option>
-        <option value="BARCELONA">BARCELONA</option>
-        <option value="ISLA PALMA">ISLA PALMA</option>
-        <option value="MENORCA">MENORCA</option>
-        <option value="IBIZA">IBIZA</option>
-      </select>
-
-      <label for="filtro-etiqueta">Filtrar por Etiqueta (Destino):</label>
+      <label for="filtro-etiqueta">Filtrar por destino:</label>
       <select id="filtro-etiqueta">
         <option value="">Todos</option>
-        <option value="Isla Palma">Isla Palma</option>
-        <option value="Menorca">Menorca</option>
-        <option value="Ibiza">Ibiza</option>
-        <option value="Barcelona">Barcelona</option>
+        <option value="isla palma">Isla palma</option>
+        <option value="barcelona">Barcelona</option>
+        <option value="menorca">Menorca</option>
+        <option value="ibiza">Ibiza</option>
       </select>
 
-      <label for="filtro-subetiqueta">Filtrar por Subetiqueta Isla Palma:</label>
-      <select id="filtro-subetiqueta" style="display:none;">
-        <option value="">Todos</option>
-        <option value="Roger Palma">Roger Palma</option>
-        <option value="Ticsa Palma">Ticsa Palma</option>
-        <option value="Solo Isla Palma">Solo Isla Palma</option>
-      </select>
+      <div id="filtro-subetiqueta-container" class="filtro-sub">
+        <label for="filtro-subetiqueta">Elige la isla (destino):</label>
+        <select id="filtro-subetiqueta">
+          <option value="">Todos</option>
+          <option value="roger palma">Roger palma</option>
+          <option value="ticsa palma">Ticsa palma</option>
+        </select>
+      </div>
 
-      <button onclick="aplicarFiltros()">Aplicar filtros</button>
-      <button onclick="limpiarFiltros()">Limpiar filtros</button>
+      <label for="filtro-fecha-inicio">Fecha de ingreso:</label>
+      <input type="date" id="filtro-fecha-inicio" />
+
+      <button id="aplicar-filtros">Aplicar filtro</button>
+      <button id="limpiar-filtros">Borrar filtro</button>
     </div>
 
-    <h3>🧾 Productos</h3>
-    <ul id="lista-productos"></ul>
+    <h2>Lista de Palets</h2>
+    <button id="eliminar-todos" style="display:none;">Eliminar todos los palets</button>
+    <ul id="lista-productos">
+      <li>NO EXISTE NINGUN PALET</li>
+    </ul>
   </div>
 
   <script>
-    const etiquetaSelect = document.getElementById("etiqueta");
-    const subetiquetaContainer = document.getElementById("subetiqueta-container");
+    const $ = id => document.getElementById(id);
+    const origen = $("origen"), etiqueta = $("etiqueta");
+    const subOrigen = $("subetiqueta-origen"), subEtiqueta = $("subetiqueta-etiqueta");
+    const contSubOrigen = $("subetiqueta-origen-container"), contSubEtiqueta = $("subetiqueta-etiqueta-container");
+    const fOrigen = $("filtro-origen"), fEtiqueta = $("filtro-etiqueta");
+    const fSubOrigen = $("filtro-suborigen"), fSubEtiqueta = $("filtro-subetiqueta");
+    const contFSubOrigen = $("filtro-suborigen-container"), contFSubEtiqueta = $("filtro-subetiqueta-container");
 
-    etiquetaSelect.addEventListener("change", () => {
-      subetiquetaContainer.style.display = etiquetaSelect.value === "Isla Palma" ? "block" : "none";
-    });
+    function toggleSub() {
+      contSubOrigen.style.display = origen.value === "isla palma" ? "block" : "none";
+      contSubEtiqueta.style.display = etiqueta.value === "isla palma" ? "block" : "none";
+    }
 
-    const filtroEtiqueta = document.getElementById("filtro-etiqueta");
-    const filtroSubetiqueta = document.getElementById("filtro-subetiqueta");
-
-    filtroEtiqueta.addEventListener("change", () => {
-      filtroSubetiqueta.style.display = filtroEtiqueta.value === "Isla Palma" ? "block" : "none";
-    });
-
-    function obtenerFechaHora() {
-      const ahora = new Date();
-      const yyyy = ahora.getFullYear();
-      const mm = String(ahora.getMonth() + 1).padStart(2, "0");
-      const dd = String(ahora.getDate()).padStart(2, "0");
-      const hh = String(ahora.getHours()).padStart(2, "0");
-      const min = String(ahora.getMinutes()).padStart(2, "0");
-      return `${yyyy}-${mm}-${dd} ${hh}:${min}`;
+    function toggleFiltroSub() {
+      contFSubOrigen.style.display = fOrigen.value === "isla palma" ? "block" : "none";
+      contFSubEtiqueta.style.display = fEtiqueta.value === "isla palma" ? "block" : "none";
     }
 
     function guardarProducto() {
-      const idEdit = document.getElementById("edit-id").value;
-      const producto = document.getElementById("producto").value.trim();
-      const palets = document.getElementById("palets").value.trim();
-      const observacion = document.getElementById("observacion").value.trim();
-      const origen = document.getElementById("origen").value;
-      const etiqueta = etiquetaSelect.value;
-      const subetiqueta = document.getElementById("subetiqueta").value;
-      if (!producto || !palets || !origen || !etiqueta) {
-        alert("Por favor completa todos los campos obligatorios (producto, palets, origen y etiqueta).");
-        return;
-      }
+      const prod = $("producto").value.trim(), pal = $("palets").value;
+      const obs = $("observacion").value.trim();
+      const orig = origen.value, eti = etiqueta.value;
+      const subOrig = orig === "isla palma" ? subOrigen.value : "";
+      const subEti = eti === "isla palma" ? subEtiqueta.value : "";
+      if (!prod || !pal || !orig || !eti) return alert("completa todos los campos obligatorios");
 
-      let productos = JSON.parse(localStorage.getItem("productos") || "[]");
-
-      if (idEdit) {
-        // Editar existente
-        productos = productos.map(p => {
-          if (p.id === idEdit) {
-            return {
-              id: p.id,
-              producto,
-              palets,
-              observacion,
-              origen,
-              etiqueta,
-              subetiqueta,
-              fecha: p.fecha
-            };
-          }
-          return p;
-        });
-        alert("Producto editado correctamente");
-        document.getElementById("edit-id").value = "";
-      } else {
-        // Nuevo producto
-        productos.push({
-          id: Date.now().toString(),
-          producto,
-          palets,
-          observacion,
-          origen,
-          etiqueta,
-          subetiqueta,
-          fecha: obtenerFechaHora()
-        });
-        alert("Producto guardado correctamente");
-      }
-
-      localStorage.setItem("productos", JSON.stringify(productos));
-      limpiarFormulario();
+      const arr = JSON.parse(localStorage.getItem("productos") || "[]");
+      arr.push({ prod, pal, obs, orig, eti, subOrig, subEti, fecha: new Date().toISOString() });
+      localStorage.setItem("productos", JSON.stringify(arr));
       mostrarProductos();
+      limpiarFormulario();
     }
 
     function limpiarFormulario() {
-      document.getElementById("producto").value = "";
-      document.getElementById("palets").value = "";
-      document.getElementById("observacion").value = "";
-      document.getElementById("origen").value = "";
-      etiquetaSelect.value = "";
-      document.getElementById("subetiqueta").value = "";
-      subetiquetaContainer.style.display = "none";
-      document.getElementById("edit-id").value = "";
+      $("producto").value = $("palets").value = $("observacion").value = "";
+      origen.value = etiqueta.value = subOrigen.value = subEtiqueta.value = "";
+      toggleSub();
     }
 
-    function mostrarProductos(productosFiltrados) {
-      const lista = document.getElementById("lista-productos");
-      let productos = productosFiltrados || JSON.parse(localStorage.getItem("productos") || "[]");
+    function capitalizar(texto) {
+      return texto ? texto.charAt(0).toUpperCase() + texto.slice(1) : "";
+    }
 
-      if (productos.length === 0) {
-        lista.innerHTML = "<li>No hay productos registrados.</li>";
+    function mostrarProductos(filtrados) {
+      const arr = filtrados || JSON.parse(localStorage.getItem("productos") || "[]").sort((a,b)=>new Date(b.fecha)-new Date(a.fecha));
+      const ul = $("lista-productos");
+      const btnEliminarTodos = $("eliminar-todos");
+      ul.innerHTML = "";
+      if (!arr.length) {
+        ul.innerHTML = "<li>no hay productos</li>";
+        btnEliminarTodos.style.display = "none";
         return;
       }
 
-      lista.innerHTML = "";
-      productos.forEach(p => {
+      btnEliminarTodos.style.display = "inline-block";
+      arr.forEach(o => {
+        let origenFinal = capitalizar(o.orig);
+        if (o.orig === "isla palma" && o.subOrig) origenFinal += " - " + capitalizar(o.subOrig);
+        let destinoFinal = capitalizar(o.eti);
+        if (o.eti === "isla palma" && o.subEti) destinoFinal += " - " + capitalizar(o.subEti);
+
         const li = document.createElement("li");
-        li.classList.add("producto");
+        li.className = "producto";
         li.innerHTML = `
-          <strong>Producto:</strong> ${p.producto} <br/>
-          <strong>Palets:</strong> ${p.palets} <br/>
-          <strong>Observación:</strong> ${p.observacion || "-"} <br/>
-          <strong>Origen del Palet:</strong> ${p.origen} <br/>
-          <strong>Etiqueta (Destino):</strong> ${p.etiqueta} <br/>
-          <strong>Subetiqueta:</strong> ${p.subetiqueta || "-"} <br/>
-          <strong>Fecha Ingreso:</strong> ${p.fecha} <br/>
-          <div class="acciones">
-            <button class="editar-btn" onclick="editarProducto('${p.id}')">✏️ Editar</button>
-            <button onclick="eliminarProducto('${p.id}')">🗑️ Eliminar</button>
-          </div>
+          <strong>Producto:</strong> ${capitalizar(o.prod)}<br/>
+          <strong>Número de Palets:</strong> ${o.pal}<br/>
+          <strong>Observación:</strong> ${o.obs || "-"}<br/>
+          <strong>Origen:</strong> ${origenFinal}<br/>
+          <strong>Destino:</strong> ${destinoFinal}<br/>
+          <strong>Fecha:</strong> ${new Date(o.fecha).toLocaleString("es-ES")}<br/>
+          <button onclick="eliminarProducto('${o.fecha}')">Eliminar</button>
         `;
-        lista.appendChild(li);
+        ul.appendChild(li);
       });
     }
 
-    function editarProducto(id) {
-      const productos = JSON.parse(localStorage.getItem("productos") || "[]");
-      const p = productos.find(prod => prod.id === id);
-      if (!p) return;
-
-      document.getElementById("edit-id").value = p.id;
-      document.getElementById("producto").value = p.producto;
-      document.getElementById("palets").value = p.palets;
-      document.getElementById("observacion").value = p.observacion;
-      document.getElementById("origen").value = p.origen;
-      etiquetaSelect.value = p.etiqueta;
-      if (p.etiqueta === "Isla Palma") {
-        subetiquetaContainer.style.display = "block";
-        document.getElementById("subetiqueta").value = p.subetiqueta;
-      } else {
-        subetiquetaContainer.style.display = "none";
-      }
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function eliminarProducto(id) {
-      if (!confirm("¿Estás seguro que deseas eliminar este producto?")) return;
-      let productos = JSON.parse(localStorage.getItem("productos") || "[]");
-      productos = productos.filter(p => p.id !== id);
-      localStorage.setItem("productos", JSON.stringify(productos));
-      mostrarProductos();
-    }
-
-    // Filtros
     function aplicarFiltros() {
-      let productos = JSON.parse(localStorage.getItem("productos") || "[]");
-      const filtroFecha = document.getElementById("filtro-fecha").value;
-      const filtroOrigen = document.getElementById("filtro-origen").value;
-      const filtroEtiqueta = document.getElementById("filtro-etiqueta").value;
-      const filtroSubetiqueta = document.getElementById("filtro-subetiqueta").value;
+      let arr = JSON.parse(localStorage.getItem("productos") || "[]");
+      const fO = fOrigen.value, fE = fEtiqueta.value;
+      const fSO = fSubOrigen.value, fSE = fSubEtiqueta.value;
+      const fFecha = $("filtro-fecha-inicio").value;
 
-      if (filtroFecha) {
-        productos = productos.filter(p => p.fecha.startsWith(filtroFecha));
-      }
-      if (filtroOrigen) {
-        productos = productos.filter(p => p.origen === filtroOrigen);
-      }
-      if (filtroEtiqueta) {
-        productos = productos.filter(p => p.etiqueta === filtroEtiqueta);
-      }
-      if (filtroEtiqueta === "Isla Palma" && filtroSubetiqueta) {
-        productos = productos.filter(p => p.subetiqueta === filtroSubetiqueta);
-      }
+      if (fO) arr = arr.filter(o => o.orig === fO);
+      if (fE) arr = arr.filter(o => o.eti === fE);
+      if (fSO) arr = arr.filter(o => o.subOrig === fSO);
+      if (fSE) arr = arr.filter(o => o.subEti === fSE);
+      if (fFecha) arr = arr.filter(o => new Date(o.fecha) >= new Date(fFecha));
 
-      mostrarProductos(productos);
+      mostrarProductos(arr);
     }
 
     function limpiarFiltros() {
-      document.getElementById("filtro-fecha").value = "";
-      document.getElementById("filtro-origen").value = "";
-      document.getElementById("filtro-etiqueta").value = "";
-      document.getElementById("filtro-subetiqueta").value = "";
-      document.getElementById("filtro-subetiqueta").style.display = "none";
+      fOrigen.value = fEtiqueta.value = fSubOrigen.value = fSubEtiqueta.value = $("filtro-fecha-inicio").value = "";
+      toggleFiltroSub();
       mostrarProductos();
     }
 
-    // Mostrar subetiqueta también cuando origen es "ISLA PALMA"
-    document.getElementById("origen").addEventListener("change", function() {
-      const valor = this.value;
-      if (valor === "ISLA PALMA") {
-        subetiquetaContainer.style.display = "block";
-      } else if (etiquetaSelect.value !== "Isla Palma") {
-        // Solo ocultar si etiqueta no es Isla Palma para evitar ocultar si la etiqueta es Isla Palma
-        subetiquetaContainer.style.display = "none";
-      }
-    });
+    function eliminarProducto(fecha) {
+      if (!confirm("¿seguro que quieres eliminar este palet?")) return;
+      let arr = JSON.parse(localStorage.getItem("productos") || "[]");
+      arr = arr.filter(o => o.fecha !== fecha);
+      localStorage.setItem("productos", JSON.stringify(arr));
+      mostrarProductos();
+    }
 
-    // Mostrar subetiqueta en filtro también cuando filtro-origen es ISLA PALMA
-    document.getElementById("filtro-origen").addEventListener("change", function() {
-      const val = this.value;
-      if (val === "ISLA PALMA") {
-        document.getElementById("filtro-subetiqueta").style.display = "block";
-      } else if (filtroEtiqueta.value !== "Isla Palma") {
-        document.getElementById("filtro-subetiqueta").style.display = "none";
-      }
-    });
+    function eliminarTodos() {
+      if (!confirm("¿seguro que quieres eliminar todos los palets?")) return;
+      localStorage.removeItem("productos");
+      mostrarProductos();
+    }
 
-    // Inicializar lista al cargar
+    $("guardar").addEventListener("click", guardarProducto);
+    $("aplicar-filtros").addEventListener("click", aplicarFiltros);
+    $("limpiar-filtros").addEventListener("click", limpiarFiltros);
+    origen.addEventListener("change", toggleSub);
+    etiqueta.addEventListener("change", toggleSub);
+    fOrigen.addEventListener("change", toggleFiltroSub);
+    fEtiqueta.addEventListener("change", toggleFiltroSub);
+
+    // inicializar
+    toggleSub();
+    toggleFiltroSub();
     mostrarProductos();
   </script>
 </body>
