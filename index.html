@@ -10,59 +10,100 @@
     }
     body {
       margin: 0;
-      font-family: 'Segoe UI', sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       font-size: 16px;
       background: #f4f6f8;
       color: #222;
       padding: 1rem;
-    }
-
-    h1, h2 {
-      text-align: center;
-      text-transform: capitalize;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
     }
 
     .container {
       max-width: 900px;
-      margin: auto;
+      width: 100%;
+      background: #fff;
+      padding: 1.5rem 2rem;
+      border-radius: 12px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    h1, h2 {
+      text-align: center;
+      font-weight: 700;
+      font-size: 2rem;
+      margin: 0;
+      color: #003366;
+      text-transform: capitalize;
+    }
+
+    form, .filtro {
+      background: #fafafa;
+      padding: 1.25rem 1.5rem;
+      border-radius: 10px;
+      box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem 2rem;
+      align-items: center;
     }
 
     label {
-      font-weight: bold;
-      margin-top: 0.5rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #004080;
+      user-select: none;
     }
 
-    input, select, button {
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    select {
       width: 100%;
-      padding: 0.5rem;
-      margin: 0.25rem 0 1rem;
-      border-radius: 6px;
-      border: 1px solid #ccc;
+      padding: 0.45rem 0.6rem;
+      border-radius: 8px;
+      border: 1px solid #bbb;
       font-size: 1rem;
+      transition: border-color 0.3s ease;
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    input[type="date"]:focus,
+    select:focus {
+      outline: none;
+      border-color: #007bff;
+      box-shadow: 0 0 6px #a3c9ff;
     }
 
     button {
-      background-color: #007bff;
-      color: white;
+      grid-column: 1 / -1;
+      padding: 0.75rem;
+      font-size: 1.1rem;
+      border-radius: 10px;
       border: none;
       cursor: pointer;
+      background-color: #007bff;
+      color: white;
+      font-weight: 700;
+      transition: background-color 0.3s ease;
+      user-select: none;
+      margin-top: 0.5rem;
     }
 
     button:hover {
       background-color: #0056b3;
     }
 
-    .producto {
-      background: #fff;
-      border-radius: 8px;
-      padding: 1rem;
-      margin-bottom: 1rem;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    }
-
     #eliminar-todos {
       background-color: #dc3545;
       margin-bottom: 1rem;
+      width: 100%;
     }
 
     #eliminar-todos:hover {
@@ -70,19 +111,75 @@
     }
 
     .subetiqueta, .filtro-sub {
+      grid-column: span 2;
       display: none;
     }
 
-    .filtro {
-      background: #ffffff;
+    .lista-palets {
+      margin-top: 1rem;
+      background: #fafafa;
+      border-radius: 10px;
       padding: 1rem;
-      border-radius: 8px;
-      margin-top: 2rem;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      box-shadow: inset 0 0 6px rgba(0,0,0,0.05);
+      max-height: 400px;
+      overflow-y: auto;
     }
 
-    .filtro button {
-      margin-top: 0.5rem;
+    ul#lista-productos {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .producto {
+      background: white;
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      font-size: 0.95rem;
+      color: #222;
+      border-left: 6px solid #007bff;
+      transition: box-shadow 0.3s ease;
+    }
+
+    .producto:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .producto strong {
+      color: #004080;
+      text-transform: capitalize;
+    }
+
+    .producto button {
+      align-self: flex-start;
+      margin-top: 0.6rem;
+      background-color: #dc3545;
+      padding: 0.4rem 0.8rem;
+      font-size: 0.9rem;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      color: white;
+      font-weight: 600;
+    }
+
+    .producto button:hover {
+      background-color: #a91d2a;
+    }
+
+    @media (max-width: 600px) {
+      form, .filtro {
+        grid-template-columns: 1fr;
+      }
+      .subetiqueta, .filtro-sub {
+        grid-column: 1 / -1;
+      }
     }
   </style>
 </head>
@@ -90,52 +187,54 @@
   <div class="container">
     <h1>Gestión de Palets</h1>
 
-    <label for="producto">Nombre del Palet:</label>
-    <input type="text" id="producto" />
+    <form id="formulario-producto" autocomplete="off">
+      <label for="producto">Nombre del Palet:</label>
+      <input type="text" id="producto" name="producto" />
 
-    <label for="palets">Cantidad de Palets:</label>
-    <input type="number" id="palets" min="1" />
+      <label for="palets">Cantidad de Palets:</label>
+      <input type="number" id="palets" name="palets" min="1" />
 
-    <label for="observacion">Observación (opcional):</label>
-    <input type="text" id="observacion" />
+      <label for="observacion">Observación (opcional):</label>
+      <input type="text" id="observacion" name="observacion" />
 
-    <label for="origen">Origen del Palet:</label>
-    <select id="origen">
-      <option value="">Selecciona el origen</option>
-      <option value="isla palma">Isla palma</option>
-      <option value="barcelona">Barcelona</option>
-      <option value="menorca">Menorca</option>
-      <option value="ibiza">Ibiza</option>
-    </select>
-
-    <div id="subetiqueta-origen-container" class="subetiqueta">
-      <label for="subetiqueta-origen">Elige la isla (opcional):</label>
-      <select id="subetiqueta-origen">
-        <option value="">Selecciona</option>
-        <option value="roger palma">Roger palma</option>
-        <option value="ticsa palma">Ticsa palma</option>
+      <label for="origen">Origen del Palet:</label>
+      <select id="origen" name="origen">
+        <option value="">Selecciona el origen</option>
+        <option value="isla palma">Isla palma</option>
+        <option value="barcelona">Barcelona</option>
+        <option value="menorca">Menorca</option>
+        <option value="ibiza">Ibiza</option>
       </select>
-    </div>
 
-    <label for="etiqueta">Destino del Palet:</label>
-    <select id="etiqueta">
-      <option value="">Selecciona el destino</option>
-      <option value="isla palma">Isla palma</option>
-      <option value="barcelona">Barcelona</option>
-      <option value="menorca">Menorca</option>
-      <option value="ibiza">Ibiza</option>
-    </select>
+      <div id="subetiqueta-origen-container" class="subetiqueta">
+        <label for="subetiqueta-origen">Elige la isla (opcional):</label>
+        <select id="subetiqueta-origen" name="subetiqueta-origen">
+          <option value="">Selecciona</option>
+          <option value="roger palma">Roger palma</option>
+          <option value="ticsa palma">Ticsa palma</option>
+        </select>
+      </div>
 
-    <div id="subetiqueta-etiqueta-container" class="subetiqueta">
-      <label for="subetiqueta-etiqueta">Elige la isla (opcional):</label>
-      <select id="subetiqueta-etiqueta">
-        <option value="">Selecciona</option>
-        <option value="roger palma">Roger palma</option>
-        <option value="ticsa palma">Ticsa palma</option>
+      <label for="etiqueta">Destino del Palet:</label>
+      <select id="etiqueta" name="etiqueta">
+        <option value="">Selecciona el destino</option>
+        <option value="isla palma">Isla palma</option>
+        <option value="barcelona">Barcelona</option>
+        <option value="menorca">Menorca</option>
+        <option value="ibiza">Ibiza</option>
       </select>
-    </div>
 
-    <button id="guardar">Guardar producto</button>
+      <div id="subetiqueta-etiqueta-container" class="subetiqueta">
+        <label for="subetiqueta-etiqueta">Elige la isla (opcional):</label>
+        <select id="subetiqueta-etiqueta" name="subetiqueta-etiqueta">
+          <option value="">Selecciona</option>
+          <option value="roger palma">Roger palma</option>
+          <option value="ticsa palma">Ticsa palma</option>
+        </select>
+      </div>
+
+      <button type="button" id="guardar">Guardar producto</button>
+    </form>
 
     <div class="filtro">
       <h2>Filtrar Palets</h2>
@@ -179,15 +278,17 @@
       <label for="filtro-fecha-inicio">Fecha de ingreso:</label>
       <input type="date" id="filtro-fecha-inicio" />
 
-      <button id="aplicar-filtros">Aplicar filtro</button>
-      <button id="limpiar-filtros">Borrar filtro</button>
+      <button id="aplicar-filtros" type="button">Aplicar filtro</button>
+      <button id="limpiar-filtros" type="button">Borrar filtro</button>
     </div>
 
     <h2>Lista de Palets</h2>
     <button id="eliminar-todos" style="display:none;">Eliminar todos los palets</button>
-    <ul id="lista-productos">
-      <li>NO EXISTE NINGUN PALET</li>
-    </ul>
+    <div class="lista-palets">
+      <ul id="lista-productos">
+        <li>NO EXISTE NINGUN PALET</li>
+      </ul>
+    </div>
   </div>
 
   <script>
@@ -215,7 +316,7 @@
       const orig = origen.value, eti = etiqueta.value;
       const subOrig = orig === "isla palma" ? subOrigen.value : "";
       const subEti = eti === "isla palma" ? subEtiqueta.value : "";
-      if (!prod || !pal || !orig || !eti) return alert("completa todos los campos obligatorios");
+      if (!prod || !pal || !orig || !eti) return alert("Completa todos los campos obligatorios");
 
       const arr = JSON.parse(localStorage.getItem("productos") || "[]");
       arr.push({ prod, pal, obs, orig, eti, subOrig, subEti, fecha: new Date().toISOString() });
@@ -235,85 +336,94 @@
     }
 
     function mostrarProductos(filtrados) {
-      const arr = filtrados || JSON.parse(localStorage.getItem("productos") || "[]").sort((a,b)=>new Date(b.fecha)-new Date(a.fecha));
+      const arr = filtrados || JSON.parse(localStorage.getItem("productos") || "[]");
       const ul = $("lista-productos");
-      const btnEliminarTodos = $("eliminar-todos");
       ul.innerHTML = "";
-      if (!arr.length) {
-        ul.innerHTML = "<li>no hay productos</li>";
-        btnEliminarTodos.style.display = "none";
+      if (arr.length === 0) {
+        ul.innerHTML = "<li>No hay productos</li>";
+        $("eliminar-todos").style.display = "none";
         return;
       }
-
-      btnEliminarTodos.style.display = "inline-block";
-      arr.forEach(o => {
-        let origenFinal = capitalizar(o.orig);
-        if (o.orig === "isla palma" && o.subOrig) origenFinal += " - " + capitalizar(o.subOrig);
-        let destinoFinal = capitalizar(o.eti);
-        if (o.eti === "isla palma" && o.subEti) destinoFinal += " - " + capitalizar(o.subEti);
-
+      arr.forEach((item, i) => {
         const li = document.createElement("li");
         li.className = "producto";
         li.innerHTML = `
-          <strong>Producto:</strong> ${capitalizar(o.prod)}<br/>
-          <strong>Número de Palets:</strong> ${o.pal}<br/>
-          <strong>Observación:</strong> ${o.obs || "-"}<br/>
-          <strong>Origen:</strong> ${origenFinal}<br/>
-          <strong>Destino:</strong> ${destinoFinal}<br/>
-          <strong>Fecha:</strong> ${new Date(o.fecha).toLocaleString("es-ES")}<br/>
-          <button onclick="eliminarProducto('${o.fecha}')">Eliminar</button>
+          <strong>Palet:</strong> ${capitalizar(item.prod)}<br />
+          <strong>Cantidad:</strong> ${item.pal}<br />
+          <strong>Observación:</strong> ${item.obs || "-"}<br />
+          <strong>Origen:</strong> ${capitalizar(item.orig)} ${item.subOrig ? `(${capitalizar(item.subOrig)})` : ""}<br />
+          <strong>Destino:</strong> ${capitalizar(item.eti)} ${item.subEti ? `(${capitalizar(item.subEti)})` : ""}<br />
+          <strong>Fecha:</strong> ${new Date(item.fecha).toLocaleDateString()}
+          <button onclick="eliminarProducto(${i})">Eliminar</button>
         `;
         ul.appendChild(li);
       });
+      $("eliminar-todos").style.display = "inline-block";
     }
 
-    function aplicarFiltros() {
-      let arr = JSON.parse(localStorage.getItem("productos") || "[]");
-      const fO = fOrigen.value, fE = fEtiqueta.value;
-      const fSO = fSubOrigen.value, fSE = fSubEtiqueta.value;
-      const fFecha = $("filtro-fecha-inicio").value;
-
-      if (fO) arr = arr.filter(o => o.orig === fO);
-      if (fE) arr = arr.filter(o => o.eti === fE);
-      if (fSO) arr = arr.filter(o => o.subOrig === fSO);
-      if (fSE) arr = arr.filter(o => o.subEti === fSE);
-      if (fFecha) arr = arr.filter(o => new Date(o.fecha) >= new Date(fFecha));
-
-      mostrarProductos(arr);
-    }
-
-    function limpiarFiltros() {
-      fOrigen.value = fEtiqueta.value = fSubOrigen.value = fSubEtiqueta.value = $("filtro-fecha-inicio").value = "";
-      toggleFiltroSub();
-      mostrarProductos();
-    }
-
-    function eliminarProducto(fecha) {
-      if (!confirm("¿seguro que quieres eliminar este palet?")) return;
-      let arr = JSON.parse(localStorage.getItem("productos") || "[]");
-      arr = arr.filter(o => o.fecha !== fecha);
+    function eliminarProducto(index) {
+      const arr = JSON.parse(localStorage.getItem("productos") || "[]");
+      arr.splice(index, 1);
       localStorage.setItem("productos", JSON.stringify(arr));
       mostrarProductos();
     }
 
     function eliminarTodos() {
-      if (!confirm("¿seguro que quieres eliminar todos los palets?")) return;
-      localStorage.removeItem("productos");
+      if (confirm("¿Seguro que quieres eliminar todos los palets?")) {
+        localStorage.removeItem("productos");
+        mostrarProductos();
+      }
+    }
+
+    function aplicarFiltros() {
+      const arr = JSON.parse(localStorage.getItem("productos") || "[]");
+      let filtrados = arr;
+
+      if (fOrigen.value) {
+        filtrados = filtrados.filter(p => p.orig === fOrigen.value);
+        if (fOrigen.value === "isla palma" && fSubOrigen.value) {
+          filtrados = filtrados.filter(p => p.subOrig === fSubOrigen.value);
+        }
+      }
+
+      if (fEtiqueta.value) {
+        filtrados = filtrados.filter(p => p.eti === fEtiqueta.value);
+        if (fEtiqueta.value === "isla palma" && fSubEtiqueta.value) {
+          filtrados = filtrados.filter(p => p.subEti === fSubEtiqueta.value);
+        }
+      }
+
+      const fechaInicio = $("filtro-fecha-inicio").value;
+      if (fechaInicio) {
+        const fechaFilter = new Date(fechaInicio);
+        filtrados = filtrados.filter(p => new Date(p.fecha) >= fechaFilter);
+      }
+
+      mostrarProductos(filtrados);
+    }
+
+    function limpiarFiltros() {
+      fOrigen.value = "";
+      fSubOrigen.value = "";
+      fEtiqueta.value = "";
+      fSubEtiqueta.value = "";
+      $("filtro-fecha-inicio").value = "";
+      toggleFiltroSub();
       mostrarProductos();
     }
 
-    $("guardar").addEventListener("click", guardarProducto);
-    $("aplicar-filtros").addEventListener("click", aplicarFiltros);
-    $("limpiar-filtros").addEventListener("click", limpiarFiltros);
     origen.addEventListener("change", toggleSub);
     etiqueta.addEventListener("change", toggleSub);
     fOrigen.addEventListener("change", toggleFiltroSub);
     fEtiqueta.addEventListener("change", toggleFiltroSub);
+    $("guardar").addEventListener("click", guardarProducto);
+    $("eliminar-todos").addEventListener("click", eliminarTodos);
+    $("aplicar-filtros").addEventListener("click", aplicarFiltros);
+    $("limpiar-filtros").addEventListener("click", limpiarFiltros);
 
-    // inicializar
+    mostrarProductos();
     toggleSub();
     toggleFiltroSub();
-    mostrarProductos();
   </script>
 </body>
 </html>
